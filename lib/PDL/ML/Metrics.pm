@@ -9,7 +9,7 @@ use PDL::Core ();
 use PDL::Lite ();
 use PDL::Ufunc ();
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.011';
 our @EXPORT_OK = qw(
     accuracy
     precision_recall_f1
@@ -130,6 +130,12 @@ PDL::ML::Metrics - Classification, regression, and similarity metrics for PDL
 
 C<PDL::ML::Metrics> provides standard classification, regression, ranking, and
 vector-similarity evaluation metrics operating on L<PDL> ndarrays.
+
+=head1 TYPES
+
+Operates on real numeric PDL ndarrays (C<float>, C<double>, and integer class
+labels such as C<long>). Complex ndarrays are not supported because standard
+classification and regression loss/score metrics are defined over real values.
 
 =head1 AUTHOR
 
