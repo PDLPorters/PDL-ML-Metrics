@@ -9,7 +9,7 @@ use PDL::Core ();
 use PDL::Lite ();
 use PDL::Ufunc ();
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.011';
 our @EXPORT_OK = qw(
     accuracy
     precision_recall_f1
@@ -131,12 +131,73 @@ PDL::ML::Metrics - Classification, regression, and similarity metrics for PDL
 C<PDL::ML::Metrics> provides standard classification, regression, ranking, and
 vector-similarity evaluation metrics operating on L<PDL> ndarrays.
 
+=head1 TUTORIAL
+
+This tutorial walks through a complete model-evaluation workflow in idiomatic
+Perl/PDL, covering binary classification metrics, confusion matrices, ROC-AUC,
+regression error metrics, and vector cosine similarity.
+
+    use strict;
+    use warnings;
+    use PDL;
+    use PDL::ML::Metrics qw(
+        accuracy
+        precision_recall_f1
+        confusion_matrix
+        roc_auc
+        mse
+        rmse
+        mae
+        r2_score
+        cosine_similarity
+    );
+
+    # 1. Classification evaluation
+    my $y_true  = long([1, 0, 1, 1, 0, 1, 0, 0]);
+    my $y_pred  = long([1, 0, 0, 1, 1, 1, 0, 0]);
+    my $y_score = double([0.92, 0.15, 0.42, 0.88, 0.61, 0.79, 0.10, 0.25]);
+
+    my $acc = accuracy($y_true, $y_pred);
+    my ($prec, $rec, $f1) = precision_recall_f1($y_true, $y_pred, 1);
+    my $cm  = confusion_matrix($y_true, $y_pred, 2);
+    my $auc = roc_auc($y_true, $y_score);
+
+    printf "Accuracy: %.3f | P=%.3f R=%.3f F1=%.3f | ROC-AUC=%.3f\n",
+        $acc, $prec, $rec, $f1, $auc;
+    print "Confusion matrix (pred x true):\n$cm\n";
+
+    # 2. Regression evaluation
+    my $target = double([3.0, -0.5, 2.0, 7.0]);
+    my $pred   = double([2.5,  0.0, 2.0, 8.0]);
+
+    printf "MSE=%.4f RMSE=%.4f MAE=%.4f R2=%.4f\n",
+        mse($target, $pred),
+        rmse($target, $pred),
+        mae($target, $pred),
+        r2_score($target, $pred);
+
+    # 3. Embedding / vector similarity
+    my $sim = cosine_similarity(double([1, 2, 3]), double([2, 4, 6]));
+    printf "Cosine similarity: %.4f\n", $sim;
+
+See C<examples/quickstart.pl> in the distribution for a runnable version of this
+tutorial.
+
+=head1 TYPES
+
+Operates on real numeric PDL ndarrays (C<float>, C<double>, and integer class
+labels such as C<long>). Complex ndarrays are not supported because standard
+classification and regression loss/score metrics are defined over real values.
+
 =head1 AUTHOR
 
 C.J. Collier E<lt>cjac@google.comE<gt>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2026 Google LLC. Apache License, Version 2.0.
+Copyright 2026 Google LLC
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut
